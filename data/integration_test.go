@@ -9,24 +9,23 @@ import (
 	"testing"
 )
 
-// setCitiesData es una función de prueba para reemplazar los datos de ciudades con datos de prueba.
+// setCitiesData is a test function to replace city data with test data.
 func setCitiesData(mockCities []City) {
 	cities = mockCities
 }
 
 // TestSuggestionsHandler tests the suggestionsHandler function by sending a mock HTTP request.
 func TestSuggestionsHandler(t *testing.T) {
-	// Crear un conjunto de datos de prueba.
+	// Create a set of data for testing
 	mockCities := []City{
 		{
 			Name:      "TestCity",
 			Latitude:  10.00000,
 			Longitude: 20.00000,
 		},
-		// Puedes agregar más ciudades de prueba si es necesario.
 	}
 
-	// Establecer los datos de prueba en el almacenamiento de ciudades.
+	// Write the data for testing
 	setCitiesData(mockCities)
 
 	req, err := http.NewRequest("GET", "/suggestions?q=TestCity&latitude=10.00000&longitude=20.00000", nil)
