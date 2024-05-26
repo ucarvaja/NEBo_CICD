@@ -1,3 +1,3 @@
-module GOLAG_REST_API
+module NEBo_CICD
 
 go 1.22.2
