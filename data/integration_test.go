@@ -73,5 +73,3 @@ func TestSuggestionsHandler(t *testing.T) {
 			actualResp, expectedResp)
 	}
 }
-
-//test_ deleted
