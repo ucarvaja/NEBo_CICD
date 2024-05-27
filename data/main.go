@@ -139,5 +139,3 @@ func calculateScore(city City, searchTerm, latitude, longitude string) float64 {
 		return 0.5
 	}
 }
-
-//adding test lines
