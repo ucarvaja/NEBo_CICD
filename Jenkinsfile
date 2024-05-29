@@ -9,5 +9,3 @@ pipeline {
         }
     }
 }
-
-// asdfa
