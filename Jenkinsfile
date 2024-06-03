@@ -1,23 +1,47 @@
 pipeline {
-    agent none // no asigna un agente global, permitiendo especificar agentes por etapa
+    agent none // Utiliza diferentes agentes según la etapa
+    environment {
+        AWS_ACCOUNT_ID = "59018394013"
+        AWS_DEFAULT_REGION = "us-east-1"
+        IMAGE_REPO_NAME = "nebo_cicd"
+        IMAGE_TAG = "latest"
+        REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
+        GIT_REPO_URL = 'git@github.com:ucarvaja/NEBo_CICD.git'
+        GIT_CREDENTIALS_ID = 'git-ssh-credentials' // Reemplaza con el ID de las credenciales SSH para GitHub en Jenkins
+    }
     stages {
-        stage('Test Sonar Slave') {
-            agent { label 'sonar_slave' } // especifica el nodo sonar_slave para esta etapa
+        stage('Logging into AWS ECR') {
+            agent { label 'sonar_slave' }
             steps {
                 script {
-                    echo "Ejecutando en el nodo Sonar Slave"
-                    sh 'hostname' // Ejecuta un comando simple para imprimir el nombre del host
-                    sh 'echo $PATH' // Imprime la variable de entorno PATH
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) { // Asegúrate de que 'aws-credentials' es el ID correcto para tus credenciales en Jenkins
+                        sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
+                    }
                 }
             }
         }
-        stage('Test Jenkins Slave 1') {
-            agent { label 'jenkins_slave_1' } // especifica el nodo jenkins_slave_1 para esta etapa
+        
+        stage('Cloning Git') {
+            agent { label 'any' } // No especifica un agente específico, utiliza cualquier disponible
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${GIT_REPO_URL}"]]])
+            }
+        }
+
+        stage('Building image') {
+            agent { label 'jenkins_slave_1' }
             steps {
                 script {
-                    echo "Ejecutando en el nodo Jenkins Slave 1"
-                    sh 'hostname' // Ejecuta un comando simple para imprimir el nombre del host
-                    sh 'echo $PATH' // Imprime la variable de entorno PATH
+                    dockerImage = docker.build "${REPOSITORY_URI}:${IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('Pushing to ECR') {
+            agent { label 'jenkins_slave_1' } 
+            steps {
+                script {
+                    sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
                 }
             }
         }
