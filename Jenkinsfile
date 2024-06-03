@@ -10,10 +10,6 @@
 //     }
 // }
 
-// add text
-
-
-
 pipeline {
     agent none // no asigna un agente global, permitiendo especificar agentes por etapa
     stages {
