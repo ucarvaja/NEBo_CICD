@@ -1,20 +1,19 @@
 pipeline {
-    agent none // Utiliza diferentes agentes según la etapa
+    agent none 
     environment {
         AWS_ACCOUNT_ID = "59018394013"
         AWS_DEFAULT_REGION = "us-east-1"
         IMAGE_REPO_NAME = "nebo_cicd"
         IMAGE_TAG = "latest"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
-        GIT_REPO_URL = 'git@github.com:ucarvaja/NEBo_CICD.git'
-        GIT_CREDENTIALS_ID = 'git-ssh-credentials' // Reemplaza con el ID de las credenciales SSH para GitHub en Jenkins
+        GIT_REPO_URL = 'https://github.com/ucarvaja/NEBo_CICD.git' // Repositorio público
     }
     stages {
         stage('Logging into AWS ECR') {
-            agent { label 'sonar_slave' }
+            agent { label 'jenkins_slave_1' }
             steps {
                 script {
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) { // Asegúrate de que 'aws-credentials' es el ID correcto para tus credenciales en Jenkins
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
                         sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
                     }
                 }
@@ -22,9 +21,11 @@ pipeline {
         }
         
         stage('Cloning Git') {
-            agent { label 'any' } // No especifica un agente específico, utiliza cualquier disponible
+            agent { label 'jenkins_slave_1' } // Utiliza cualquier agente disponible
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${GIT_REPO_URL}"]]])
+                script {
+                    checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
+                }
             }
         }
 
@@ -38,7 +39,7 @@ pipeline {
         }
 
         stage('Pushing to ECR') {
-            agent { label 'jenkins_slave_1' } 
+            agent { label 'jenkins_slave_1' } // Usa el mismo agente para construir y subir la imagen
             steps {
                 script {
                     sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
