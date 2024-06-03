@@ -10,22 +10,11 @@ pipeline {
 
     }
     stages {
-        // stage('Logging into AWS ECR') {
-        //     agent any
-        //     steps {
-        //         script {
-        //             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
-        //                 sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
-        //             }
-        //         }
-        //     }
-        // }
-        stage('Cloning Git') {
+        stage('CheckOut') {
             agent { label 'jenkins_slave_1' }
             steps {
                 script {
                     checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
-                    //checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]])
                 }
             }
         }
@@ -40,7 +29,15 @@ pipeline {
         }
 
         stage('Pushing to ECR') {
-            agent { label 'jenkins_slave_1' } // Usa el mismo agente para construir y subir la imagen
+            agent { label 'jenkins_slave_1' } 
+
+            steps {
+                script {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                        sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
+                    }
+                }
+            }
             steps {
                 script {
                     sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
