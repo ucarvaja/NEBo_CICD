@@ -6,11 +6,11 @@ pipeline {
         IMAGE_REPO_NAME = "nebo_cicd"
         IMAGE_TAG = "latest"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
-        GIT_REPO_URL = 'https://github.com/ucarvaja/NEBo_CICD.git' // Repositorio público
+        GIT_REPO_URL = 'https://github.com/ucarvaja/NEBo_CICD.git' 
     }
     stages {
         stage('Logging into AWS ECR') {
-            agent { label 'jenkins_slave_1' }
+            agent any
             steps {
                 script {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
