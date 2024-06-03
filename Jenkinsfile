@@ -9,6 +9,15 @@ pipeline {
         GIT_REPO_URL = 'https://github.com/ucarvaja/NEBo_CICD.git' 
     }
     stages {
+
+        stage('Cloning Git') {
+            agent { label 'jenkins_slave_1' } // Utiliza cualquier agente disponible
+            steps {
+                script {
+                    checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
+                }
+            }
+        }
         stage('Logging into AWS ECR') {
             agent any
             steps {
@@ -20,14 +29,7 @@ pipeline {
             }
         }
         
-        stage('Cloning Git') {
-            agent { label 'jenkins_slave_1' } // Utiliza cualquier agente disponible
-            steps {
-                script {
-                    checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
-                }
-            }
-        }
+        
 
         stage('Building image') {
             agent { label 'jenkins_slave_1' }
