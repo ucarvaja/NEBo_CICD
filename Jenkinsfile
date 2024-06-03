@@ -7,7 +7,7 @@ pipeline {
         IMAGE_TAG = "latest"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
         GIT_REPO_URL = 'https://github.com/ucarvaja/NEBo_CICD.git' 
-        checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/ucarvaja/NEBo_CICD']])
+
     }
     stages {
         // stage('Logging into AWS ECR') {
@@ -24,8 +24,8 @@ pipeline {
             agent { label 'jenkins_slave_1' }
             steps {
                 script {
-                    //checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
-                    checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]])
+                    checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
+                    //checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]])
                 }
             }
         }
