@@ -30,7 +30,6 @@ pipeline {
                 """
             }
         }
-}
             // steps{
             //     checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
             //     script{
