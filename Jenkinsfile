@@ -17,7 +17,41 @@ pipeline {
                 }
             }
         }
-        
+        stage("SonarQube analysis") {
+        agent {label "sonar_slave"}
+            steps{
+                sonar-scanner \
+                -Dsonar.projectKey=NEBO_CICD \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=http://ec2-54-157-154-58.compute-1.amazonaws.com:9000 \
+                -Dsonar.login=sqp_d73721d20c2c36e44b9161f49531f3d60762d658
+            }
+            // steps{
+            //     checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
+            //     script{
+            //         def scannerHome = tool "sonar6.0";
+            //         withSonarQubeEnv("sonarcloud") { 
+            //         sh "${scannerHome}/bin/sonar-scanner"
+            //         }
+            //     }
+            // }
+        }
+
+        stage("Quality Gate"){
+        agent {label "sonar_slave"}  
+            steps{
+                checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
+                    timeout(time: 1, unit: 'HOURS') {                  
+                    def qg = waitForQualityGate() 
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            }
+                    }
+                }
+            }
+        }          
+
+
         stage('Building image') {
             agent { label 'jenkins_slave_1' }
             steps {
@@ -27,23 +61,18 @@ pipeline {
             }
         }
     stage ('Build and Push to ECR') {
-            agent {label "jenkins_slave_1"}
-            
-            
+            agent {label "jenkins_slave_1"}    
             steps {
-                //checkout([$class: "GitSCM",branches: [[name: '*/test']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-ssh-key-new', url: 'https://github.com/Felipe8617/gowebapp.git']]])
-                
                 withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}", "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"]) {
-                // sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/u9q6y4u2"
                 sh ""
                 sh "docker build -t nebo_cicd ."
                 sh "docker tag nebo_cicd:latest 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest"
                 sh "docker push 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest"
                 }
             }
-        }
-
-        // stage('Pushing to ECR') {
+        } 
+    }
+    // stage('Pushing to ECR') {
         //     agent { label 'jenkins_slave_1' }
         //     steps {
         //         script {
@@ -54,7 +83,7 @@ pipeline {
         //         }
         //     }
         // }
-    }
+
 }
 
 
