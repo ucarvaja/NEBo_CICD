@@ -28,6 +28,7 @@ pipeline {
                     -Dsonar.host.url=http://ec2-54-157-154-58.compute-1.amazonaws.com:9000 \
                     -Dsonar.login=sqp_d73721d20c2c36e44b9161f49531f3d60762d658
                     """
+                    }
                 }
             }
                 // steps{
@@ -38,8 +39,8 @@ pipeline {
                 //         sh "${scannerHome}/bin/sonar-scanner"
                 //         }
                 //     }
-        }
-        
+    //     }
+    // }
 
         stage("Quality Gate"){
         agent {label "sonar_slave"}  
@@ -64,18 +65,18 @@ pipeline {
                 }
             }
         }
-    stage ('Build and Push to ECR') {
-            agent {label "jenkins_slave_1"}    
-            steps {
-                withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}", "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"]) {
-                sh ""
-                sh "docker build -t nebo_cicd ."
-                sh "docker tag nebo_cicd:latest 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest"
-                sh "docker push 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest"
+        stage ('Build and Push to ECR') {
+                agent {label "jenkins_slave_1"}    
+                steps {
+                    withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}", "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"]) {
+                    sh ""
+                    sh "docker build -t nebo_cicd ."
+                    sh "docker tag nebo_cicd:latest 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest"
+                    sh "docker push 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest"
+                    }
                 }
-            }
-        } 
-    }
+            } 
+    
     // stage('Pushing to ECR') {
         //     agent { label 'jenkins_slave_1' }
         //     steps {
@@ -87,8 +88,4 @@ pipeline {
         //         }
         //     }
         // }
-
 }
-
-
-
