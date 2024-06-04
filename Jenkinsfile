@@ -27,7 +27,7 @@ pipeline {
             }
         }
     stage ('Build and Push to ECR') {
-            agent {label "slave_jenkins"}
+            agent {label "jenkins_slave_1"}
             
             
             steps {
