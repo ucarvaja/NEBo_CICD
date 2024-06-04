@@ -114,6 +114,7 @@ pipeline {
             agent {label "sonar_slave"}
             steps {
                 script {
+                    def scannerHome = tool 'sonar6.0'
                     sh """
                     sonar-scanner \
                     -Dsonar.projectKey=NEBO_CICD \
