@@ -17,15 +17,20 @@ pipeline {
                 }
             }
         }
-        stage("SonarQube analysis") {
+    stage("SonarQube analysis") {
         agent {label "sonar_slave"}
-            steps{
+        steps {
+            script {
+                sh """
                 sonar-scanner \
                 -Dsonar.projectKey=NEBO_CICD \
                 -Dsonar.sources=. \
                 -Dsonar.host.url=http://ec2-54-157-154-58.compute-1.amazonaws.com:9000 \
                 -Dsonar.login=sqp_d73721d20c2c36e44b9161f49531f3d60762d658
-                }
+                """
+            }
+        }
+}
             // steps{
             //     checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
             //     script{
