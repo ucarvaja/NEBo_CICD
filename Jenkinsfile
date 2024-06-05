@@ -4,7 +4,7 @@ pipeline {
         AWS_ACCOUNT_ID = "590183940136"
         AWS_DEFAULT_REGION = "us-east-1"
         IMAGE_REPO_NAME = "nebo_cicd"
-        IMAGE_TAG = "latest"
+        IMAGE_TAG = "latest2"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
         GIT_REPO_URL = 'https://github.com/ucarvaja/NEBo_CICD.git' 
     }
