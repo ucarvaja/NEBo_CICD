@@ -83,28 +83,26 @@ pipeline {
         }
         // Descomenta y configura las etapas de SonarQube si es necesario.
         // ...
-        stage('Build Image and Push to ECR') {
-            agent { label 'jenkins_slave_1' }
-            steps {
-                script {
-                    // Elimina imágenes existentes para evitar problemas de espacio en disco.
-                    sh 'docker rmi $(docker images -q) --force || true'
-                    // Autentica con ECR.
-                    sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}'
-                    // Obtiene el hash del commit actual.
-                    def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-                    // Construye la imagen de Docker con el tag del commit.
-                    dockerImage = docker.build "${REPOSITORY_URI}:${commitId}"
-                    // Sube la imagen a ECR con el tag del commit.
-                    sh "docker push ${REPOSITORY_URI}:${commitId}"
-                    // También sube la imagen con el tag 'latest'.
-                    sh "docker tag ${REPOSITORY_URI}:${commitId}"
-                    sh "docker push ${REPOSITORY_URI}:${commitId}"
-                    // Cierra la sesión en ECR para asegurarse de que las credenciales no permanezcan en el agente.
-                    sh 'docker logout'
-                }
-            }
+    stage('Build Image and Push to ECR') {
+    agent { label 'jenkins_slave_1' }
+    steps {
+        script {
+            // Elimina imágenes existentes para evitar problemas de espacio en disco.
+            sh 'docker rmi $(docker images -q) --force || true'
+            // Autentica con ECR.
+            sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}'
+            // Obtiene el hash del commit actual.
+            def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+            // Construye la imagen de Docker con el tag del commit.
+            dockerImage = docker.build "${REPOSITORY_URI}:${commitId}"
+            // Sube la imagen a ECR con el tag del commit.
+            sh "docker push ${REPOSITORY_URI}:${commitId}"
+            // Cierra la sesión en ECR para asegurarse de que las credenciales no permanezcan en el agente.
+            sh 'docker logout'
         }
+    }
+}
+
     }
 }
 
