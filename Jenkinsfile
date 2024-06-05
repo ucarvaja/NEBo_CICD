@@ -62,7 +62,9 @@ pipeline {
                 // Obtener el token de inicio de sesión de ECR y pasar al inicio de sesión de Docker
 
                 //sh "TOKEN=$(aws ecr get-authorization-token --output text --query 'authorizationData[].authorizationToken')"
-                sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
+                sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
+                sh "sleep 5"
+                sh " docker login --username AWS --password-stdin ${REPOSITORY_URI}"
                 // Empujar la imagen al ECR
                 sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
                     }
