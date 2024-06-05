@@ -59,7 +59,8 @@ pipeline {
     steps {
         script {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'awscreds']]) {
-                sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
+                sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}" 
+                sh "docker login --username AWS --password-stdin ${REPOSITORY_URI}"
                 sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
 
             // withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}", "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"]){
