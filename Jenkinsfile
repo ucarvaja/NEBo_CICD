@@ -107,6 +107,3 @@ pipeline {
         }
     }
 }
-
-
-// test 2
