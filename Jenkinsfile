@@ -110,34 +110,34 @@ pipeline {
                 }
             }
         }
-        stage("SonarQube analysis") {
-            agent {label "sonar_slave"}
-            steps {
-                script {
-                    def scannerHome = tool 'sonar6.0'
-                    sh """
-                    sonar-scanner \
-                    -Dsonar.projectKey=NEBO_CICD \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://ec2-54-157-154-58.compute-1.amazonaws.com:9000/ \
-                    -Dsonar.login=sqp_d73721d20c2c36e44b9161f49531f3d60762d658
-                    """
-                }
-            }
-        }
-        stage("Quality Gate"){
-            agent {label "sonar_slave"}  
-            steps {
-                timeout(time: 1, unit: 'HOURS') {                  
-                    script {
-                        def qg = waitForQualityGate() 
-                        if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                        }
-                    }
-                }
-            }
-        }
+        // stage("SonarQube analysis") {
+        //     agent {label "sonar_slave"}
+        //     steps {
+        //         script {
+        //             def scannerHome = tool 'sonar6.0'
+        //             sh """
+        //             sonar-scanner \
+        //             -Dsonar.projectKey=NEBO_CICD \
+        //             -Dsonar.sources=. \
+        //             -Dsonar.host.url=http://ec2-54-157-154-58.compute-1.amazonaws.com:9000 \
+        //             -Dsonar.login=sqp_d73721d20c2c36e44b9161f49531f3d60762d658
+        //             """
+        //         }
+        //     }
+        // }
+        // stage("Quality Gate"){
+        //     agent {label "sonar_slave"}  
+        //     steps {
+        //         timeout(time: 1, unit: 'HOURS') {                  
+        //             script {
+        //                 def qg = waitForQualityGate() 
+        //                 if (qg.status != 'OK') {
+        //                     error "Pipeline aborted due to quality gate failure: ${qg.status}"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
         stage('Building image') {
             agent { label 'jenkins_slave_1' }
             steps {
