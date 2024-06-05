@@ -58,7 +58,7 @@ pipeline {
     agent { label 'jenkins_slave_1' }
     steps {
         script {
-            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'your-aws-credentials-id']]) {
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'awscreds']]) {
                 sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
                 sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
 
