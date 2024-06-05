@@ -142,6 +142,7 @@ pipeline {
             agent { label 'jenkins_slave_1' }
             steps {
                 script {
+                    sh 'docker rmi $(docker images -q) --force || true'
                     dockerImage = docker.build "${REPOSITORY_URI}:${IMAGE_TAG}"
                 }
             }
