@@ -151,7 +151,8 @@ pipeline {
     agent { label 'jenkins_slave_1' }
     steps {
         script {
-            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'awscreds']]) {
+            //withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'awscreds']]) {
+            withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}", "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}"])
                 // Obtener el token de inicio de sesión de ECR y pasar al inicio de sesión de Docker
                 sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
                 // Empujar la imagen al ECR
