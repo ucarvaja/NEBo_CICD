@@ -67,17 +67,20 @@ pipeline {
         AWS_ACCOUNT_ID = "590183940136"
         AWS_DEFAULT_REGION = "us-east-1"
         IMAGE_REPO_NAME = "nebo_cicd"
-        // Se elimina IMAGE_TAG ya que se generará dinámicamente más adelante.
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
-        GIT_REPO_URL = 'https://github.com/ucarvaja/NEBo_CICD.git' 
+        GIT_REPO_URL = 'https://github.com/ucarvaja/NEBo_CICD.git'
+        // La variable COMMIT_ID se inicializará más adelante.
+        COMMIT_ID = ""
     }
     stages {
         stage('CheckOut') {
             agent { label 'jenkins_slave_1' }
             steps {
                 script {
-                    // Realiza el checkout y establece la variable GIT_COMMIT.
-                    checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
+                    // Realiza el checkout y establece la variable COMMIT_ID.
+                    def scmVars = checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
+                    // Asigna el hash del commit a la variable de entorno COMMIT_ID.
+                    COMMIT_ID = scmVars.GIT_COMMIT.take(7) // Tomamos solo los primeros 7 caracteres del hash del commit.
                 }
             }
         }
@@ -91,15 +94,10 @@ pipeline {
                     sh 'docker rmi $(docker images -q) --force || true'
                     // Autentica con ECR.
                     sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}'
-                    // Obtiene el hash del commit actual.
-                    def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                     // Construye la imagen de Docker con el tag del commit.
-                    dockerImage = docker.build "${REPOSITORY_URI}:${commitId}"
+                    dockerImage = docker.build "${REPOSITORY_URI}:${COMMIT_ID}"
                     // Sube la imagen a ECR con el tag del commit.
-                    sh "docker push ${REPOSITORY_URI}:${commitId}"
-                    // También sube la imagen con el tag 'latest'.
-                    sh "docker tag ${REPOSITORY_URI}:${commitId} ${REPOSITORY_URI}:latest"
-                    sh "docker push ${REPOSITORY_URI}:latest"
+                    sh "docker push ${REPOSITORY_URI}:${COMMIT_ID}"
                     // Cierra la sesión en ECR para asegurarse de que las credenciales no permanezcan en el agente.
                     sh 'docker logout'
                 }
@@ -107,3 +105,4 @@ pipeline {
         }
     }
 }
+
