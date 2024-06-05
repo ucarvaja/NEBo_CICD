@@ -67,7 +67,7 @@ pipeline {
         AWS_ACCOUNT_ID = "590183940136"
         AWS_DEFAULT_REGION = "us-east-1"
         IMAGE_REPO_NAME = "nebo_cicd"
-        // Se elimina IMAGE_TAG ya que se generará dinámicamente más adelante.
+        // IMAGE_TAG is removed since it will be dynamically generated later.
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
         GIT_REPO_URL = 'https://github.com/ucarvaja/NEBo_CICD.git' 
     }
@@ -76,33 +76,50 @@ pipeline {
             agent { label 'jenkins_slave_1' }
             steps {
                 script {
-                    // Realiza el checkout y establece la variable GIT_COMMIT.
+                    // Performs the checkout and sets the GIT_COMMIT variable.
                     checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
                 }
             }
         }
-        // Descomenta y configura las etapas de SonarQube si es necesario.
+
+        stage('Test') {
+            agent { label 'sonar_slave' }
+            steps {
+                script {
+                    // Set up Go environment if necessary
+                    sh 'export GOPATH=$WORKSPACE'
+                    sh 'export PATH=$PATH:$GOPATH/bin'
+
+                    // Navigate to the directory containing Go files
+                    dir('data') {
+                        // Run unit tests
+                        sh 'go test -v ./... -run Unit'
+                        // Run integration tests
+                        sh 'go test -v ./... -run Integration'
+                    }
+                }
+            }
+        }
+        // Uncomment and configure SonarQube stages if necessary.
         // ...
-    stage('Build Image and Push to ECR') {
-    agent { label 'jenkins_slave_1' }
-    steps {
-        script {
-            // Elimina imágenes existentes para evitar problemas de espacio en disco.
-            sh 'docker rmi $(docker images -q) --force || true'
-            // Autentica con ECR.
-            sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}'
-            // Obtiene el hash del commit actual.
-            def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-            // Construye la imagen de Docker con el tag del commit.
-            dockerImage = docker.build "${REPOSITORY_URI}:${commitId}"
-            // Sube la imagen a ECR con el tag del commit.
-            sh "docker push ${REPOSITORY_URI}:${commitId}"
-            // Cierra la sesión en ECR para asegurarse de que las credenciales no permanezcan en el agente.
-            sh 'docker logout'
+        stage('Build Image and Push to ECR') {
+            agent { label 'jenkins_slave_1' }
+            steps {
+                script {
+                    // Removes existing images to avoid disk space issues.
+                    sh 'docker rmi $(docker images -q) --force || true'
+                    // Authenticates with ECR.
+                    sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}'
+                    // Gets the current commit hash.
+                    def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    // Builds the Docker image with the commit tag.
+                    dockerImage = docker.build "${REPOSITORY_URI}:${commitId}"
+                    // Pushes the image to ECR with the commit tag.
+                    sh "docker push ${REPOSITORY_URI}:${commitId}"
+                    // Logs out of ECR to ensure credentials do not remain on the agent.
+                    sh 'docker logout'
+                }
+            }
         }
     }
 }
-
-    }
-}
-
