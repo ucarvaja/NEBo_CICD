@@ -59,7 +59,7 @@ pipeline {
             steps {
 
                 sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
-                h "docker login --username AWS --password-stdin ${REPOSITORY_URI}"
+                sh "docker login --username AWS --password-stdin ${REPOSITORY_URI}"
                 sh 'docker push ${REPOSITORY_URI}:${IMAGE_TAG}'
                 sh 'docker logout'
         }
