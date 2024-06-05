@@ -45,23 +45,27 @@ pipeline {
         //         }
         //     }
         // }
-        stage('Building image') {
-            agent { label 'jenkins_slave_1' }
-            steps {
-                script {
-                    sh 'docker rmi $(docker images -q) --force || true'
-                    dockerImage = docker.build "${REPOSITORY_URI}:${IMAGE_TAG}"
-                }
-            }
-        }
-        stage('Pushing to ECR') {
+        // stage('Building image') {
+        //     agent { label 'jenkins_slave_1' }
+        //     steps {
+        //         script {
+        //             sh 'docker rmi $(docker images -q) --force || true'
+        //             dockerImage = docker.build "${REPOSITORY_URI}:${IMAGE_TAG}"
+        //         }
+        //     }
+        // }
+        stage('building and Pushing to ECR') {
         agent { label 'jenkins_slave_1' }
             steps {
+                sh 'docker rmi $(docker images -q) --force || true'
+                sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 590183940136.dkr.ecr.us-east-1.amazonaws.com'
+                dockerImage = docker.build "${REPOSITORY_URI}:${IMAGE_TAG}"
+                sh 'docker push 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest'
 
-                sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
-                sh "docker login --username AWS --password-stdin ${REPOSITORY_URI}"
-                sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
-                sh 'docker logout'
+                // sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
+                // sh "docker login --username AWS --password-stdin ${REPOSITORY_URI}"
+                // sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
+                // sh 'docker logout'
         }
         }
     }
