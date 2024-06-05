@@ -67,11 +67,11 @@ pipeline {
                 // sh "docker login --username AWS --password-stdin ${REPOSITORY_URI}"
                 // sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
                 // sh 'docker logout'
-        }
+                }
+            }
         }
     }
 }
-
 
 //   script {
 //             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'awscreds']]) {
