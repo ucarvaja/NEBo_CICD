@@ -45,26 +45,13 @@ pipeline {
         //         }
         //     }
         // }
-        // stage('Building image') {
-        //     agent { label 'jenkins_slave_1' }
-        //     steps {
-        //         script {
-        //             sh 'docker rmi $(docker images -q) --force || true'
-        //             dockerImage = docker.build "${REPOSITORY_URI}:${IMAGE_TAG}"
-        //         }
-        //     }
-        // }
         stage('Build Image and Push to ECR') {
         agent { label 'jenkins_slave_1' }
             steps {
             script {    
                 sh 'docker rmi $(docker images -q) --force || true'
-                sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 590183940136.dkr.ecr.us-east-1.amazonaws.com'
+                sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
                 dockerImage = docker.build "${REPOSITORY_URI}:${IMAGE_TAG}"
-                //sh 'docker push 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest2'
-
-                // sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
-                // sh "docker login --username AWS --password-stdin ${REPOSITORY_URI}"
                 sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
                 sh 'docker logout'
                 }
@@ -72,21 +59,3 @@ pipeline {
         }
     }
 }
-
-//   script {
-//             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'awscreds']]) {
-//                 sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}" 
-//                 sh "docker login --username AWS --password-stdin ${REPOSITORY_URI}"
-//                 sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
-
-//             // withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}", "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"]){
-//             //     // Obtener el token de inicio de sesión de ECR y pasar al inicio de sesión de Docker
-
-//             //     //sh "TOKEN=$(aws ecr get-authorization-token --output text --query 'authorizationData[].authorizationToken')"
-//             //     sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
-//             //     //sh "sleep 5"
-//             //     sh " docker login --username AWS --password-stdin ${REPOSITORY_URI}"
-//             //     // Empujar la imagen al ECR
-//             //     sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
-//                     }
-//                 }
