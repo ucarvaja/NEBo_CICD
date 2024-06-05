@@ -1,7 +1,7 @@
 pipeline {
     agent none 
     environment {
-        AWS_ACCOUNT_ID = "59018394013"
+        AWS_ACCOUNT_ID = "590183940136"
         AWS_DEFAULT_REGION = "us-east-1"
         IMAGE_REPO_NAME = "nebo_cicd"
         IMAGE_TAG = "latest"
@@ -58,7 +58,8 @@ pipeline {
         agent { label 'jenkins_slave_1' }
             steps {
 
-                sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 590183940136.dkr.ecr.us-east-1.amazonaws.com'
+                sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
+                h "docker login --username AWS --password-stdin ${REPOSITORY_URI}"
                 sh 'docker push ${REPOSITORY_URI}:${IMAGE_TAG}'
                 sh 'docker logout'
         }
