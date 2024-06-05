@@ -4,7 +4,7 @@ pipeline {
         AWS_ACCOUNT_ID = "590183940136"
         AWS_DEFAULT_REGION = "us-east-1"
         IMAGE_REPO_NAME = "nebo_cicd"
-        IMAGE_TAG = "latest2"
+        IMAGE_TAG = "latest"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
         GIT_REPO_URL = 'https://github.com/ucarvaja/NEBo_CICD.git' 
     }
@@ -54,19 +54,19 @@ pipeline {
         //         }
         //     }
         // }
-        stage('building and Pushing to ECR') {
+        stage('Build Image and Push to ECR') {
         agent { label 'jenkins_slave_1' }
             steps {
             script {    
                 sh 'docker rmi $(docker images -q) --force || true'
                 sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 590183940136.dkr.ecr.us-east-1.amazonaws.com'
                 dockerImage = docker.build "${REPOSITORY_URI}:${IMAGE_TAG}"
-                sh 'docker push 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest2'
+                //sh 'docker push 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest2'
 
                 // sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
                 // sh "docker login --username AWS --password-stdin ${REPOSITORY_URI}"
-                // sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
-                // sh 'docker logout'
+                sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
+                sh 'docker logout'
                 }
             }
         }
