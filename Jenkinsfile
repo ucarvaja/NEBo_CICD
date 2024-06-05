@@ -61,7 +61,7 @@ pipeline {
                 sh 'docker rmi $(docker images -q) --force || true'
                 sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 590183940136.dkr.ecr.us-east-1.amazonaws.com'
                 dockerImage = docker.build "${REPOSITORY_URI}:${IMAGE_TAG}"
-                sh 'docker push 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest'
+                sh 'docker push 590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest2'
 
                 // sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
                 // sh "docker login --username AWS --password-stdin ${REPOSITORY_URI}"
