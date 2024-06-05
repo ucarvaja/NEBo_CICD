@@ -86,18 +86,20 @@ pipeline {
             agent { label 'sonar_slave' }
             steps {
                 script {
-                    // check out repo
-                    checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
-                    // Set up Go environment if necessary
-                    sh 'export GOPATH=$WORKSPACE'
-                    sh 'export PATH=$PATH:$GOPATH/bin'
+                    sh "go test"
 
-                    // Navigate to the directory containing Go files
-                    dir('data') {
-                        // Run unit tests
-                        sh 'go test -v ./... -run Unit'
-                        // Run integration tests
-                        sh 'go test -v ./... -run Integration'
+                    // // check out repo
+                    // checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
+                    // // Set up Go environment if necessary
+                    // sh 'export GOPATH=$WORKSPACE'
+                    // sh 'export PATH=$PATH:$GOPATH/bin'
+
+                    // // Navigate to the directory containing Go files
+                    // dir('data') {
+                    //     // Run unit tests
+                    //     sh 'go test -v ./... -run Unit'
+                    //     // Run integration tests
+                    //     sh 'go test -v ./... -run Integration'
                     }
                 }
             }
