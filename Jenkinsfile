@@ -86,7 +86,9 @@ pipeline {
             agent { label 'sonar_slave' }
             steps {
                 script {
+                    dir('data') {
                     sh 'go test'
+                    }
                     // check out repo
                     checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
                     // Set up Go environment if necessary
