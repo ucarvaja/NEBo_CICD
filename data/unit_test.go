@@ -22,7 +22,7 @@ func TestCalculateScore(t *testing.T) {
 		{"ExactMatch", city, searchTerm, latitude, longitude, 1.0},
 		{"NameMatchLatitudeMatch", city, searchTerm, latitude, "0.00000", 0.9},
 		{"NameMatchLongitudeMatch", city, searchTerm, "0.00000", longitude, 0.9},
-		{"NameMatch", city, searchTerm, "0.00000", "0.00000", 0.8},
+		{"NameMatch", city, searchTerm, "0.00000-6555656", "0.00000", 0.8},
 		{"LatitudeLongitudeMatch", city, "DifferentCity", latitude, longitude, 0.7},
 		{"LatitudeMatch", city, "DifferentCity", latitude, "0.00000", 0.6},
 		{"LongitudeMatch", city, "DifferentCity", "0.00000", longitude, 0.6},

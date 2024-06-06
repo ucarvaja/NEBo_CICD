@@ -98,9 +98,9 @@ pipeline {
                     // Navigate to the directory containing Go files
                     dir('data') {
                         // Run unit tests
-                        sh 'go test -v ./... -run Unit'
+                        sh 'go test -v ./... -run unit'
                         // Run integration tests
-                        sh 'go test -v ./... -run Integration'
+                        sh 'go test -v ./... -run integration'
                     }
                 }
             }
