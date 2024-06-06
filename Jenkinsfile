@@ -21,7 +21,7 @@ pipeline {
             agent { label 'sonar_slave' }
             steps {
                 script {
-                    // check out repo
+                    // check out repository
                     checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
                     dir('data') {
                         sh 'go test -v -run TestSuggestionsHandler'
