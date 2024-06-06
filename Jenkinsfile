@@ -30,6 +30,22 @@ pipeline {
                 }
             }
         }
+
+        stage("SonarQube analysis") {
+        agent {label "sonar_slave"}
+            steps{
+                checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
+            
+                script{
+                    def scannerHome = tool "sonar6.0";
+                    withSonarQubeEnv("sonarqube") { 
+                    sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+
+
         // Uncomment and configure SonarQube stages if necessary.
         // ...
         stage('Build Image and Push to ECR') {
