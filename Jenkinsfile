@@ -46,8 +46,6 @@ pipeline {
         }
 
 
-        // Uncomment and configure SonarQube stages if necessary.
-        // ...
         stage('Build Image and Push to ECR') {
             agent { label 'jenkins_slave_1' }
             steps {
