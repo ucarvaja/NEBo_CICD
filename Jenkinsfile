@@ -45,6 +45,19 @@ pipeline {
             }
         }
 
+        stage("Quality Gate"){
+        agent {label "sonar_slave"}  
+            steps{
+                script{
+                    timeout(time: 1, unit: 'HOURS') {                  
+                    def qg = waitForQualityGate() 
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            }
+                        }
+                    }
+                }
+            }
 
         stage('Build Image and Push to ECR') {
             agent { label 'jenkins_slave_1' }
