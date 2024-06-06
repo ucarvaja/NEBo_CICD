@@ -26,6 +26,13 @@ pipeline {
                     dir('data') {
                         sh 'go test -v -run TestSuggestionsHandler'
                         sh 'go test -v -run TestCalculateScore'
+
+                        //covertura
+                        sh 'go test -v -coverprofile=coverage.out ./...'
+                        sh 'go get github.com/axw/gocov/gocov'
+                        sh 'go get github.com/AlekSi/gocov-xml'
+                        sh 'gocov convert coverage.out | gocov-xml > coverage.xml'
+                        
                     }  
                 }
             }
