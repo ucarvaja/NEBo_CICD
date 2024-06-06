@@ -21,7 +21,7 @@ func TestSuggestionsHandler(t *testing.T) {
 		{
 			Name:      "TestCity",
 			Latitude:  10.00000,
-			Longitude: 20.00000,
+			Longitude: ff20.00000,
 		},
 	}
 
