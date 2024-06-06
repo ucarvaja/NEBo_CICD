@@ -37,7 +37,7 @@ pipeline {
                 checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]]
             
                 script{
-                    def scannerHome = tool "sonar6.0";
+                    def scannerHome = tool "sonar4.7";
                     withSonarQubeEnv("sonarqube") { 
                     sh "${scannerHome}/bin/sonar-scanner"
                     }
