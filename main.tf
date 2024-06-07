@@ -179,11 +179,11 @@ resource "aws_ecs_task_definition" "nebocicd_task" {
   network_mode             = "awsvpc"
   memory                   = 512
   cpu                      = 256
-execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
   container_definitions = jsonencode([
     {
-      "name" : "{nebocicd_container",
-      "image" = "590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest",
+      "name" : "nebocicd_container",
+      "image" : "590183940136.dkr.ecr.us-east-1.amazonaws.com/nebo_cicd:latest",
       "memory" : 512,
       "cpu" : 256,
       "essential" : true,
@@ -237,4 +237,3 @@ output "cluster_name" {
 output "family_name" {
   value = aws_ecs_task_definition.nebocicd_task.family
 }
-//test text
