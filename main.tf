@@ -182,8 +182,8 @@ resource "aws_ecs_task_definition" "nebocicd_task" {
 execution_role_arn       = aws_iam_role.ecs_execution_role.arn
   container_definitions = jsonencode([
     {
-      "name" : "{nebocicd_container",
-      "image" = "${ecr_repository_uri}:${ecr_image_tag}",
+      "name" : "nebocicd_container",
+      "image" : "${ecr_repository_uri}:${ecr_image_tag}",
       "memory" : 512,
       "cpu" : 256,
       "essential" : true,
