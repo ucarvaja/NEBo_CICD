@@ -92,12 +92,9 @@ pipeline {
             agent {label "slave_jenkins"}
             steps{
                 script{
-                    sh "terraform apply -auto-approve"
-               
+                    sh "terraform apply -auto-approve"  
                 }
-            }
-                
+            }       
         }
-
     }
 }
