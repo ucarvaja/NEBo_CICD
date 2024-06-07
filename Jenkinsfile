@@ -70,7 +70,7 @@ pipeline {
                     dockerImage = docker.build "${REPOSITORY_URI}:${commitId}"
                     sh "docker push ${REPOSITORY_URI}:${commitId}"
                     dockerImage = docker.build "${REPOSITORY_URI}:latest"
-                    sh "docker push ${REPOSITORY_URI}:latest" // this is for the terraform file not recomended
+                    sh "docker push ${REPOSITORY_URI}:latest" // this is for the terraform file not recomended.
                     sh 'docker logout'
                 }
             }
