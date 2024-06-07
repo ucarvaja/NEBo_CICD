@@ -75,5 +75,28 @@ pipeline {
                 }
             }
         }
+        stage('Building Infrastructure IaaC'){
+            agent {label "jenkins_slave_1"}
+            steps{
+                script{
+                    sh "terraform fmt"
+                    sh "terraform init"
+                    sh "terraform validate"
+                    sh "terraform plan"
+                }
+            }
+                
+        }
+        
+        stage("Deploying in AWS"){
+            agent {label "jenkins_slave_1"}
+            steps{
+                script{
+                    sh "terraform apply -auto-approve"
+                }
+            }
+                
+        }
+
     }
 }
