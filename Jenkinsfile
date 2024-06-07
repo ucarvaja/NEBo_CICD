@@ -89,7 +89,7 @@ pipeline {
         }
         
         stage("Deploying in AWS"){
-            agent {label "slave_jenkins"}
+            agent {label "jenkins_slave_1"}
             steps{
                 script{
                     sh "terraform apply -auto-approve"  
