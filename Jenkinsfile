@@ -69,6 +69,7 @@ pipeline {
                     def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                     dockerImage = docker.build "${REPOSITORY_URI}:${commitId}"
                     sh "docker push ${REPOSITORY_URI}:${commitId}"
+                    sh "docker push ${REPOSITORY_URI}:latest" // this is for the terraform file not recomended
                     sh 'docker logout'
                 }
             }
