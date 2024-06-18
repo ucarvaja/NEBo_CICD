@@ -28,7 +28,7 @@ This is a complete pipeline project build from scratch.
 ![Pipeline_config](/Images/NEBO_CICD_config_pipeline.png)
 
 
-### Seting Jenkis Nodes
+### Setting Jenkis Nodes
 
 ![nodes](/Images/NEBO_CICD_created_nodes.png)
 
